@@ -27,6 +27,25 @@ Pre-commit is configured to use the following tools for checking and formatting 
 - eslint
 - prettier
 - pyupgrade
+
+### Contribution Files Explanation
+
+site_config.json is used for site-specific settings like database credentials and developer mode, whereas common_site_config.json stores global configurations shared across all sites in the bench like the database host. If a secret is accidentally placed in common_site_config.json, it becomes accessible to every site on that bench regardless of its environment. This creates a security risk where production sites might unintentionally leak sensitive data or inherit development-only credentials. Therefore, keeping secrets in the individual site_config.json ensures proper isolation and security for multi-tenant setups.
+
+### Bench Processes
+The bench start command launches the following four processes:
+
+web: The web server handling browser requests.
+
+worker: Executes background tasks and asynchronous jobs.
+
+scheduler: Enqueues scheduled events and periodic tasks.
+
+socketio: Provides real-time communication for notifications and updates.
+
+### Background Jobs Impact:
+If the worker process crashes, background jobs will remain in the "Queued" state in the database. No background tasks—such as sending emails or processing long reports—will be executed until the worker is restarted.
+
 ### CI
 
 This app can use GitHub Actions for CI. The following workflows are configured:
