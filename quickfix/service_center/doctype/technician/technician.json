@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "TECH-####",
+ "autoname": "TECH-.####",
  "creation": "2026-02-24 17:29:52.765866",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -84,7 +84,7 @@
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2026-02-24 17:37:04.073926",
+ "modified": "2026-02-25 11:06:42.679042",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Technician",
