@@ -33,3 +33,17 @@ def get_job_cards_safe():
             jc.pop("customer_email", None)
 
     return job_cards
+
+def rename_technician(old_name, new_name):
+
+    frappe.rename_doc(
+        "Technician",
+        old_name,
+        new_name,
+        merge=False
+    )
+
+    return "Technician renamed successfully"
+
+# Using merge=True can merge two different records into one if the target name already exists. 
+# This may cause unintended data merging and loss of record separation, leading to data integrity issues.
