@@ -66,3 +66,25 @@ Frappe stores modification history of field values. Changes are visible in the d
 Q2 : Unique - Database level unique index is created when we set setting unique for a feild. Even if we skip the validations the DB will reject duplicates.
 
     frappe.db.exists() - Checks manually before saving the document and it is application-level validation. It can be bypassed if logic is removed.
+
+### D1 - Roles, Permissions Matrix and Document Sharing
+
+Q1 : frappe.only_for("QF Manager") restricts the method to users having the QF Manager role. If a non-manager calls the method, Frappe raises a PermissionError and stops execution, returning a 403 Not Permitted response.
+
+Q2 : {'if_owner': {},
+ 'has_if_owner_enabled': False,
+ 'select': 0,
+ 'read': 1,
+ 'write': 1,
+ 'create': 0,
+ 'delete': 0,
+ 'submit': 1,
+ 'cancel': 0,
+ 'amend': 0,
+ 'print': 0,
+ 'email': 0,
+ 'report': 0,
+ 'import': 0,
+ 'export': 0,
+ 'share': 0}
+Logged in as Technician

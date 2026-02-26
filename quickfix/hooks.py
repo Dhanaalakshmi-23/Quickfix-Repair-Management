@@ -5,6 +5,18 @@ app_description = "Electronic repair shop"
 app_email = "dhanaalakshminarayanan@gmail.com"
 app_license = "mit"
 
+fixtures = [
+    {
+    "doctype":"Role",
+        "filters": [
+            ["name", "in", ["QF Manager", "QF Technician"]
+            ]
+        ]
+    },
+    {
+    "doctype":"Custom DocPerm"
+    }
+]
 # Apps
 # ------------------
 
