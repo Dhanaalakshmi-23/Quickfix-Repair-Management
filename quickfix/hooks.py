@@ -23,6 +23,19 @@ permission_query_conditions = {
 has_permission = {
     "Service Invoice": "quickfix.permissions.service_invoice_has_permission"
 }
+override_doctype_class = {
+    "Job Card": "quickfix.override.custom_job_card.CustomJobCard"
+}
+
+doc_events = {
+    "*": {
+        
+        "on_update": "quickfix.audit.log_change",
+        "on_submit": "quickfix.audit.log_change",
+        "on_cancel": "quickfix.audit.log_change"
+    }
+}    
+
 # Apps
 # ------------------
 
