@@ -95,3 +95,12 @@ Using frappe.get_all() in an whitelist method wont check the frappe's permission
 ### E1 - Complete Job Card Lifecycle
 Calling self.save() inside on_update() causes infinite recursion because save() triggers on_update() again. This results in a recursion error. The correct approach is to use self.db_set() or move the logic to validate() to avoid triggering the lifecycle repeatedly.
 
+### E3 - Standard Controller Pattern & override_doctype_class
+Part - B : doc_events is safer because it extends the existing DocType behavior without replacing the original controller class. Core validations and future framework updates continue to run automatically. In contrast, override_doctype_class replaces the controller entirely and can break core logic if super() is not called.
+
+### F1 - doc_events: Wildcard, Multiple Handlers, Order
+Order of execution: When two validate handlers are registered for Job Card , Frappe first executes the controller’s validate() method, then executes the handlers defined in doc_events. If both a wildcard "*" handler and a specific Job Card handler are registered, the execution order is: controller validate() → wildcard handler → specific DocType handler.
+
+If both raise frappe.ValidationError: Execution stops immediately when the first frappe.ValidationError is raised. The remaining handlers will not run, and the document save operation fails.
+
+When "*" and a specific DocType handler are registered for the same event: Yes, both run. Frappe merges them internally and executes them sequentially according to the event resolution order (controller first, then wildcard, then specific handler).

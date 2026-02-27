@@ -32,7 +32,7 @@ class SparePart(Document):
                 message,
                 title="Invalid Pricing"
             )
-
+    
     def autoname(self):
         if self.part_code:
             self.part_code = self.part_code.upper()
