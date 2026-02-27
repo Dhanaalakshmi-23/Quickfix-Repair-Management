@@ -14,10 +14,10 @@ class SparePart(Document):
 
 
     def validate(self):
-        self._validate_pricing()
+        self.validate_pricing()
 
 
-    def _validate_pricing(self):
+    def validate_pricing(self):
 
         if self.unit_cost is None or self.selling_price is None:
             return
@@ -32,3 +32,9 @@ class SparePart(Document):
                 message,
                 title="Invalid Pricing"
             )
+
+    def autoname(self):
+        if self.part_code:
+            self.part_code = self.part_code.upper()
+        self.name = frappe.model.naming.make_autoname("SP-.####")
+        

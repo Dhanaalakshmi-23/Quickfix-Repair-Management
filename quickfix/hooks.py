@@ -17,6 +17,12 @@ fixtures = [
     "doctype":"Custom DocPerm"
     }
 ]
+permission_query_conditions = {
+    "Job Card": "quickfix.permissions.job_card_query_conditions"
+}
+has_permission = {
+    "Service Invoice": "quickfix.permissions.service_invoice_has_permission"
+}
 # Apps
 # ------------------
 

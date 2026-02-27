@@ -88,3 +88,10 @@ Q2 : {'if_owner': {},
  'export': 0,
  'share': 0}
 Logged in as Technician
+
+### D2 - Permission Query & has_permission
+Using frappe.get_all() in an whitelist method wont check the frappe's permission system, including permission_query_conditions. This means low-privilege users or guests can access records they are not supposed to see. It can cause serious data leakage.
+
+### E1 - Complete Job Card Lifecycle
+Calling self.save() inside on_update() causes infinite recursion because save() triggers on_update() again. This results in a recursion error. The correct approach is to use self.db_set() or move the logic to validate() to avoid triggering the lifecycle repeatedly.
+
