@@ -35,7 +35,17 @@ doc_events = {
         "on_cancel": "quickfix.audit.log_change"
     }
 }    
+after_install = "quickfix.setup.after_install"
 
+before_uninstall = "quickfix.setup.before_uninstall"
+
+extend_bootinfo = "quickfix.boot.extend_bootinfo"
+
+on_session_creation = "quickfix.session.on_session_creation"
+
+on_logout = "quickfix.session.on_logout"
+
+app_include_js = "quickfix.bundle.js"
 # Apps
 # ------------------
 
