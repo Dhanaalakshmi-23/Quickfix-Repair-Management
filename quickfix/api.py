@@ -47,3 +47,14 @@ def rename_technician(old_name, new_name):
 
 # Using merge=True can merge two different records into one if the target name already exists. 
 # This may cause unintended data merging and loss of record separation, leading to data integrity issues.
+
+def mark_delivered(job_card):
+
+    doc = frappe.get_doc("Job Card", job_card)
+
+    doc.status = "Delivered"
+    doc.save()
+
+    frappe.db.commit()
+
+    return "Delivered"

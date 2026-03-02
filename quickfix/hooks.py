@@ -46,6 +46,9 @@ on_session_creation = "quickfix.session.on_session_creation"
 on_logout = "quickfix.session.on_logout"
 
 app_include_js = "quickfix.bundle.js"
+
+def boot_session(bootinfo):
+    bootinfo.quickfix_shop_name = "QuickFix Service Center"
 # Apps
 # ------------------
 
