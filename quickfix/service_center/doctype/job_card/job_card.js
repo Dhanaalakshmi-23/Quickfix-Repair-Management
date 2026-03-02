@@ -67,7 +67,105 @@ frappe.ui.form.on("Job Card", {
             );
         }
 
+        // Reject Job Button
 
+        if (frm.doc.docstatus === 1 && frm.doc.status !== "Rejected") {
+
+            frm.add_custom_button("Reject Job", function() {
+
+                let dialog = new frappe.ui.Dialog({
+                    title: "Reject Job",
+                    fields: [
+                        {
+                            label: "Rejection Reason",
+                            fieldname: "rejection_reason",
+                            fieldtype: "Small Text",
+                            reqd: 1
+                        }
+                    ],
+                    primary_action_label: "Submit",
+                    primary_action(values) {
+
+                        frappe.call({
+                            method: "quickfix.api.reject_job",
+                            args: {
+                                job_card: frm.doc.name,
+                                reason: values.rejection_reason
+                            },
+                            callback: function(r) {
+                                if (!r.exc) {
+                                    dialog.hide();
+                                    frm.reload_doc();
+                                }
+                            }
+                        });
+
+                    }
+                });
+
+                dialog.show();
+
+            }, "Actions");
+
+        }
+
+        // Transfer Technician
+
+        if (frm.doc.docstatus === 1) {
+
+            frm.add_custom_button("Transfer Technician", function() {
+
+                frappe.prompt(
+                    [
+                        {
+                            label: "New Technician",
+                            fieldname: "new_technician",
+                            fieldtype: "Link",
+                            options: "Technician",
+                            reqd: 1
+                        }
+                    ],
+                    function(values) {
+
+                        frappe.confirm(
+                            "Are you sure you want to transfer?",
+                            function() {
+
+                                frappe.call({
+                                    method: "quickfix.api.transfer_technician",
+                                    args: {
+                                        job_card: frm.doc.name,
+                                        new_technician: values.new_technician
+                                    },
+                                    callback: function(r) {
+
+                                        if (!r.exc) {
+
+                                            frm.set_value(
+                                                "assigned_technician",
+                                                values.new_technician
+                                            );
+
+                                            // 🔥 Re-run assigned_technician handler
+                                            frm.trigger("assigned_technician");
+
+                                            frm.reload_doc();
+                                        }
+
+                                    }
+                                });
+
+                            }
+                        );
+
+                    },
+                    "Transfer Technician",
+                    "Transfer"
+                );
+
+            }, "Actions");
+
+        }
 
     },
 

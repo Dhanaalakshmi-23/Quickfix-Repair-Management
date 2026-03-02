@@ -58,3 +58,26 @@ def mark_delivered(job_card):
     frappe.db.commit()
 
     return "Delivered"
+
+def reject_job(job_card, reason):
+
+    doc = frappe.get_doc("Job Card", job_card)
+
+    doc.status = "Rejected"
+    doc.rejection_reason = reason
+    doc.save()
+
+    frappe.db.commit()
+
+    return "Rejected"
+
+def transfer_technician(job_card, new_technician):
+
+    doc = frappe.get_doc("Job Card", job_card)
+
+    doc.assigned_technician = new_technician
+    doc.save()
+
+    frappe.db.commit()
+
+    return "Transferred"
