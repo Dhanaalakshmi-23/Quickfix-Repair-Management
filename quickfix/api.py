@@ -12,11 +12,11 @@ def share_job_card(job_card_name, customer_email):
     )
     
     return f"Job Card {job_card_name} shared with {customer_email}"
-
+@frappe.whitelist()
 def manager_only_action():
     frappe.only_for("QF Manager")
     return "This action is allowed only for QF Manager"
-
+@frappe.whitelist()
 def get_job_cards_safe():
     user = frappe.session.user
     roles = frappe.get_roles(user)
@@ -33,7 +33,7 @@ def get_job_cards_safe():
             jc.pop("customer_email", None)
 
     return job_cards
-
+@frappe.whitelist()
 def rename_technician(old_name, new_name):
 
     frappe.rename_doc(
@@ -47,7 +47,7 @@ def rename_technician(old_name, new_name):
 
 # Using merge=True can merge two different records into one if the target name already exists. 
 # This may cause unintended data merging and loss of record separation, leading to data integrity issues.
-
+@frappe.whitelist()
 def mark_delivered(job_card):
 
     doc = frappe.get_doc("Job Card", job_card)
@@ -58,7 +58,7 @@ def mark_delivered(job_card):
     frappe.db.commit()
 
     return "Delivered"
-
+@frappe.whitelist()
 def reject_job(job_card, reason):
 
     doc = frappe.get_doc("Job Card", job_card)
@@ -70,7 +70,7 @@ def reject_job(job_card, reason):
     frappe.db.commit()
 
     return "Rejected"
-
+@frappe.whitelist()
 def transfer_technician(job_card, new_technician):
 
     doc = frappe.get_doc("Job Card", job_card)
@@ -81,3 +81,14 @@ def transfer_technician(job_card, new_technician):
     frappe.db.commit()
 
     return "Transferred"
+@frappe.whitelist()
+def mark_ready(job_card):
+
+    doc = frappe.get_doc("Job Card", job_card)
+
+    doc.status = "Ready for Delivery"
+    doc.save()
+
+    frappe.db.commit()
+
+    return "Ready"

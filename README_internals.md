@@ -104,3 +104,45 @@ Order of execution: When two validate handlers are registered for Job Card , Fra
 If both raise frappe.ValidationError: Execution stops immediately when the first frappe.ValidationError is raised. The remaining handlers will not run, and the document save operation fails.
 
 When "*" and a specific DocType handler are registered for the same event: Yes, both run. Frappe merges them internally and executes them sequentially according to the event resolution order (controller first, then wildcard, then specific handler).
+
+### F3 - Asset, Jinja & Website Hooks
+
+Asset Hook :
+1. app_include_js vs web_include_js
+
+app_include_js loads JavaScript files only inside the Desk (backend UI) and is available to logged-in users. It is used when we want to customize or extend ERP behavior such as modifying the navbar, adding global client-side logic, or using boot data for internal users.
+
+web_include_js loads JavaScript files only on Website and Portal pages, including public routes. It is used for customer-facing features such as tracking pages, landing pages, or public forms.
+
+Difference:
+app_include_js → Internal Desk environment
+web_include_js → Public Website/Portal environment
+
+2. doctype_js (Job Card)
+
+doctype_js loads a JavaScript file only when the Form View of a specific DocType is opened.
+
+For Job Card, this is used to:
+Add custom buttons, Perform client-side validations, Trigger events on field changes, Add dynamic UI behavior.
+
+It ensures the script runs only on the Job Card form and not globally.
+
+3. doctype_list_js (Job Card)
+
+doctype_list_js loads JavaScript only on the List View of a specific DocType.
+
+For Job Card, this can be used to:
+Add row indicators, Color-code records, Add quick action buttons, Customize list-level behavior
+
+This keeps list customizations isolated to that DocType.
+
+4. `doctype_tree_js` is used for DocTypes that have a hierarchical parent-child structure and are displayed in a Tree View, such as Account (Chart of Accounts) or Item Group. Tree view is required when records are nested and expandable, allowing users to manage structured data efficiently.
+
+5. `bench build --app quickfix` compiles and bundles the app’s frontend assets (JS/CSS), generates optimized files, and creates hashed filenames for proper asset management. Cache-busting is required after JS changes because browsers store old versions in cache, and the new hashed filenames ensure the browser loads the updated files instead of the cached ones.
+
+Jinja Hook : 
+Difference Between Print Format Context and Website Page Context :
+The Jinja context in Print Formats is document-centric and primarily provides access to the current document (doc), its metadata, and system utilities for rendering PDFs or printed documents.
+The Jinja context in Website Pages is request-centric and includes route parameters, request data, user session details, and custom context variables passed from the web controller.
+
+They are not the same — Print Format context is focused on rendering a specific document, while Website context is focused on handling web requests and dynamic page rendering.

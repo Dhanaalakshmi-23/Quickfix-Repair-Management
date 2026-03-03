@@ -47,8 +47,24 @@ on_logout = "quickfix.session.on_logout"
 
 app_include_js = "quickfix.bundle.js"
 
-def boot_session(bootinfo):
-    bootinfo.quickfix_shop_name = "QuickFix Service Center"
+jinja={
+    "methods":[
+        "quickfix.utils.get_shop_name"
+    ],
+    "filters":[
+        "quickfix.utils.format_job_id"
+    ]
+}
+
+website_route_rules=[
+    {"from_route":"/track-job","to_route":"job_portal"}
+]
+portal_menu_items = [
+    {
+        "title": "Track Job",
+        "route": "/track-job",
+        "role": "Guest"
+    }]
 # Apps
 # ------------------
 
