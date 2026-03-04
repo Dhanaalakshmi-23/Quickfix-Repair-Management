@@ -1,6 +1,8 @@
 import frappe
 
 def job_card_query_conditions(user):
+    if user == "Administrator":
+        return None
     if "QF Technician" in frappe.get_roles(user):
         return f"`tabJob Card`.assigned_technician = '{user}'"
     return None

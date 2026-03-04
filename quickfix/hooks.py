@@ -17,9 +17,9 @@ fixtures = [
     "doctype":"Custom DocPerm"
     }
 ]
-permission_query_conditions = {
-    "Job Card": "quickfix.permissions.job_card_query_conditions"
-}
+# permission_query_conditions = {
+#     "Job Card": "quickfix.permissions.job_card_query_conditions"
+# }
 has_permission = {
     "Service Invoice": "quickfix.permissions.service_invoice_has_permission"
 }
@@ -65,6 +65,11 @@ portal_menu_items = [
         "route": "/track-job",
         "role": "Guest"
     }]
+
+override_whitelisted_methods = {
+    "frappe.client.get_count": "quickfix.api.custom_get_count"
+}
+
 # Apps
 # ------------------
 

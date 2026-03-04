@@ -1,4 +1,5 @@
 import frappe
+from frappe.client import get_count
 
 @frappe.whitelist()
 def share_job_card(job_card_name, customer_email):
@@ -92,3 +93,18 @@ def mark_ready(job_card):
     frappe.db.commit()
 
     return "Ready"
+
+
+@frappe.whitelist()
+def custom_get_count(doctype, filters=None, debug=False, cache=False):
+    
+    # Log to Audit Log
+    frappe.get_doc({
+        "doctype": "Audit Log",
+        "doctype_name": doctype,
+        "action": "count_queried",
+        "user": frappe.session.user
+    }).insert(ignore_permissions=True)
+
+    # Call original logic
+    return get_count(doctype, filters, debug, cache)

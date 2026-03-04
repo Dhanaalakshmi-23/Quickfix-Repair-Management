@@ -146,3 +146,13 @@ The Jinja context in Print Formats is document-centric and primarily provides ac
 The Jinja context in Website Pages is request-centric and includes route parameters, request data, user session details, and custom context variables passed from the web controller.
 
 They are not the same — Print Format context is focused on rendering a specific document, while Website context is focused on handling web requests and dynamic page rendering.
+
+### F4 - override_whitelisted_methods Hook
+1. Difference between override_whitelisted_methods and Monkey Patching
+override_whitelisted_methods is an official Frappe hook used to safely replace a whitelisted method through hooks.py. It is explicit, reversible, and upgrade-safe because Frappe internally reroutes calls at runtime. Monkey patching, on the other hand, modifies a function directly at import time by reassigning it in memory. It is brittle, harder to trace, and can break due to app load order or updates. In production, hooks should be preferred; monkey patching is only suitable for temporary or experimental use.
+
+2. What happens if two apps override the same method?
+If two apps register override_whitelisted_methods for the same method, only one override will apply. Frappe loads apps based on the order in sites/apps.txt, and the last loaded app’s override takes effect. There is no automatic chaining, so earlier overrides are silently replaced.
+
+3. Signature mismatch and TypeError
+When overriding a whitelisted method, the custom function must have the exact same parameters as the original. Since Frappe passes arguments using keywords, missing or mismatched parameters will cause a TypeError (e.g., “unexpected keyword argument” or “missing required positional argument”). Matching the signature ensures the override works without breaking the API.
