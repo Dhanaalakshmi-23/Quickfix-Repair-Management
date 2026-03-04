@@ -15,11 +15,33 @@ fixtures = [
     },
     {
     "doctype":"Custom DocPerm"
+    },
+    {
+        "doctype": "Custom Field"
+    },
+    {
+        "doctype": "Property Setter"
+    },
+    {
+        "doctype": "Role"
+    },
+    {
+        "doctype": "Workspace"
+    },
+    {
+        "doctype": "Device Type",
+        "filters": [
+            ["name", "in", ["Laptop", "Mobile", "Tablet"]]
+        ]
+    },
+    {
+        "doctype": "QuickFix Settings"
     }
 ]
-# permission_query_conditions = {
-#     "Job Card": "quickfix.permissions.job_card_query_conditions"
-# }
+
+permission_query_conditions = {
+    "Job Card": "quickfix.permissions.job_card_query_conditions"
+}
 has_permission = {
     "Service Invoice": "quickfix.permissions.service_invoice_has_permission"
 }

@@ -156,3 +156,31 @@ If two apps register override_whitelisted_methods for the same method, only one 
 
 3. Signature mismatch and TypeError
 When overriding a whitelisted method, the custom function must have the exact same parameters as the original. Since Frappe passes arguments using keywords, missing or mismatched parameters will cause a TypeError (e.g., “unexpected keyword argument” or “missing required positional argument”). Matching the signature ensures the override works without breaking the API.
+
+### F5 - Fixtures & Property Setters in Install
+1. Fieldname collision risk:
+If our Custom Field has:
+fieldname = "remarks"
+
+And in a future Frappe update:
+Core team also adds:
+fieldname = "remarks"
+
+Then:
+Migration fails
+Duplicate column error occurs
+Site breaks during update
+Because DB cannot have two columns with same name.
+
+2. If merged into one patch:
+
+During migration, order may break
+Database column may not exist yet
+Patch fails
+
+Patches must be:
+patch1.py
+patch2.py
+And listed separately in: patches.txt
+
+Because Frappe runs patches in order listed.Each patch is a migration checkpoint.Never merge dependent patches
