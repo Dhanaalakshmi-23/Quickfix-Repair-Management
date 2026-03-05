@@ -190,3 +190,14 @@ Tree DocType is used to represent hierarchical data structures such as Account o
 
 doctype_tree_js is used to customize the behavior and UI of the Tree View in Frappe. A Tree DocType requires special fields such as parent_field to store the parent node and is_group to indicate whether the record is a group or a leaf node.
 
+### H4 - Client Script DocType vs Shipped JS
+Client Script vs App JS
+
+Client Script DocType allows writing JavaScript customizations directly in the database without deploying code. It is useful for quick UI changes by consultants or administrators. However, it is harder to version control and maintain in large systems.
+Shipped JS files are part of the application code and are managed using Git and deployment pipelines. App developers prefer this approach because it ensures version control, testing, and consistency across environments.
+
+Risks of Client Script in Production
+Client Scripts are stored in the database and can be modified directly in production, which can lead to unstable behavior if improperly edited. They also lack proper code review and version tracking.
+
+JS Hiding Is Not Security
+Hiding a field using JavaScript only affects the UI display. The data still exists in the backend and can be accessed through API calls. Therefore, JavaScript field hiding should never be considered a security mechanism. Proper security must be implemented using role permissions and field-level access control.

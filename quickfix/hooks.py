@@ -92,6 +92,10 @@ override_whitelisted_methods = {
     "frappe.client.get_count": "quickfix.api.custom_get_count"
 }
 
+doctype_js = {
+    "Job Card": "public/js/job_card.js"
+}
+
 # Apps
 # ------------------
 
