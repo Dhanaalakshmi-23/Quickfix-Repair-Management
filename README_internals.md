@@ -184,3 +184,9 @@ patch2.py
 And listed separately in: patches.txt
 
 Because Frappe runs patches in order listed.Each patch is a migration checkpoint.Never merge dependent patches
+
+### H3 - List View & Tree View
+Tree DocType is used to represent hierarchical data structures such as Account or Employee hierarchy where records have parent-child relationships.
+
+doctype_tree_js is used to customize the behavior and UI of the Tree View in Frappe. A Tree DocType requires special fields such as parent_field to store the parent node and is_group to indicate whether the record is a group or a leaf node.
+

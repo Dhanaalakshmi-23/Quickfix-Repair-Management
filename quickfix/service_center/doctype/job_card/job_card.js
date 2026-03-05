@@ -32,11 +32,11 @@ frappe.ui.form.on("Job Card", {
 
     refresh: function(frm) {
 
-        if (frm.doc.status === "Open") {
-            frm.dashboard.add_indicator("Open", "orange");
+        if (frm.doc.status === "Awaiting Customer Approval") {
+            frm.dashboard.add_indicator("Awaiting Customer Approval", "orange");
         }
-        else if (frm.doc.status === "In Progress") {
-            frm.dashboard.add_indicator("In Progress", "blue");
+        else if (frm.doc.status === "In Repair") {
+            frm.dashboard.add_indicator("In Repair", "blue");
         }
         else if (frm.doc.status === "Ready for Delivery") {
             frm.dashboard.add_indicator("Ready", "green");

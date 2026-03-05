@@ -1,14 +1,15 @@
 import frappe
 
 def after_install():
-    frappe.make_property_setter(
-        "Job Card",          
-        "remarks",           
-        "bold",              
-        1,                   
-        "Check"              
-    )
-    frappe.call
+    frappe.make_property_setter({
+        "doctype":"Job Card",
+        "fieldname":"remarks",
+        "property":"bold",
+        "value":"1",
+        "property_type":"Check"
+    })
+    frappe.db.commit()
+
     create_default_device_types()
     create_default_settings()
     frappe.msgprint("QuickFix installed successfully with default setup.")

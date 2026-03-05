@@ -2,11 +2,11 @@ frappe.listview_settings["Job Card"] = {
 
     // Fetch extra fields
     add_fields: ["final_amount", "priority", "status"],
-
+    has_indicator_for_draft: true,
     get_indicator: function(doc) {
 
-        if (doc.status === "Open") {
-            return ["Open", "orange", "status,=,Open"];
+        if (doc.status === "Draft") {
+            return ["Draft", "orange", "status,=,Draft"];
         }
 
         if (doc.status === "In Repair") {
