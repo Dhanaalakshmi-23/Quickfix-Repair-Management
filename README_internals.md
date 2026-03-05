@@ -201,3 +201,6 @@ Client Scripts are stored in the database and can be modified directly in produc
 
 JS Hiding Is Not Security
 Hiding a field using JavaScript only affects the UI display. The data still exists in the backend and can be accessed through API calls. Therefore, JavaScript field hiding should never be considered a security mechanism. Proper security must be implemented using role permissions and field-level access control.
+
+### I1 - Query Report with SQL Safety
+The EXPLAIN statement was executed in the bench console to analyze the query execution plan. The output shows that the status column uses the status index in the key field, indicating that the database optimizer is using the index for filtering. This improves performance by avoiding a full table scan.
