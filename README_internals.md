@@ -204,3 +204,17 @@ Hiding a field using JavaScript only affects the UI display. The data still exis
 
 ### I1 - Query Report with SQL Safety
 The EXPLAIN statement was executed in the bench console to analyze the query execution plan. The output shows that the status column uses the status index in the key field, indicating that the database optimizer is using the index for filtering. This improves performance by avoiding a full table scan.
+
+### I4 - Prepared Report
+1. Prepared Reports vs Real-Time Script Reports - Prepared Reports are used for large datasets where generating the report in real-time would be slow. The report is generated in the background using a worker and the result is cached in the Prepared Report DocType. Real-time Script Reports run immediately when the user opens the report and always show the latest data.
+
+2. Staleness Tradeoff - The Prepared Reports store cached results, so the data may become stale if the underlying records change after the report has been prepared. For example, if a new Job Card is created after the report is generated, the cached report will not include it until the report is regenerated.
+
+3. When to Use Prepared Reports
+
+Prepared Reports are useful when:
+- The dataset is large
+- Queries take a long time to run
+- The report is used frequently but does not require real-time updates
+
+4. Caching Risk - If the underlying data changes between report preparations, users will see the previously cached result instead of the latest data. To mitigate this, reports can be regenerated periodically or users can manually refresh them.

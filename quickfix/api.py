@@ -108,3 +108,17 @@ def custom_get_count(doctype, filters=None, debug=False, cache=False):
 
     # Call original logic
     return get_count(doctype, filters, debug, cache)
+
+
+@frappe.whitelist()
+def prepare_technician_performance_report():
+
+    frappe.enqueue(
+        method="frappe.core.doctype.prepared_report.prepared_report.run_background",
+        queue="long",
+        timeout=600,
+        report_name="Technician Performance Report",
+        filters={}
+    )
+
+    return "Report preparation started in background."
