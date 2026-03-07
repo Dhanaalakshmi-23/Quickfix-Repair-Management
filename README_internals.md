@@ -104,3 +104,103 @@ Order of execution: When two validate handlers are registered for Job Card , Fra
 If both raise frappe.ValidationError: Execution stops immediately when the first frappe.ValidationError is raised. The remaining handlers will not run, and the document save operation fails.
 
 When "*" and a specific DocType handler are registered for the same event: Yes, both run. Frappe merges them internally and executes them sequentially according to the event resolution order (controller first, then wildcard, then specific handler).
+
+### F3 - Asset, Jinja & Website Hooks
+
+Asset Hook :
+1. app_include_js vs web_include_js
+
+app_include_js loads JavaScript files only inside the Desk (backend UI) and is available to logged-in users. It is used when we want to customize or extend ERP behavior such as modifying the navbar, adding global client-side logic, or using boot data for internal users.
+
+web_include_js loads JavaScript files only on Website and Portal pages, including public routes. It is used for customer-facing features such as tracking pages, landing pages, or public forms.
+
+Difference:
+app_include_js → Internal Desk environment
+web_include_js → Public Website/Portal environment
+
+2. doctype_js (Job Card)
+
+doctype_js loads a JavaScript file only when the Form View of a specific DocType is opened.
+
+For Job Card, this is used to:
+Add custom buttons, Perform client-side validations, Trigger events on field changes, Add dynamic UI behavior.
+
+It ensures the script runs only on the Job Card form and not globally.
+
+3. doctype_list_js (Job Card)
+
+doctype_list_js loads JavaScript only on the List View of a specific DocType.
+
+For Job Card, this can be used to:
+Add row indicators, Color-code records, Add quick action buttons, Customize list-level behavior
+
+This keeps list customizations isolated to that DocType.
+
+4. `doctype_tree_js` is used for DocTypes that have a hierarchical parent-child structure and are displayed in a Tree View, such as Account (Chart of Accounts) or Item Group. Tree view is required when records are nested and expandable, allowing users to manage structured data efficiently.
+
+5. `bench build --app quickfix` compiles and bundles the app’s frontend assets (JS/CSS), generates optimized files, and creates hashed filenames for proper asset management. Cache-busting is required after JS changes because browsers store old versions in cache, and the new hashed filenames ensure the browser loads the updated files instead of the cached ones.
+
+Jinja Hook : 
+Difference Between Print Format Context and Website Page Context :
+The Jinja context in Print Formats is document-centric and primarily provides access to the current document (doc), its metadata, and system utilities for rendering PDFs or printed documents.
+The Jinja context in Website Pages is request-centric and includes route parameters, request data, user session details, and custom context variables passed from the web controller.
+
+They are not the same — Print Format context is focused on rendering a specific document, while Website context is focused on handling web requests and dynamic page rendering.
+
+### F4 - override_whitelisted_methods Hook
+1. Difference between override_whitelisted_methods and Monkey Patching
+override_whitelisted_methods is an official Frappe hook used to safely replace a whitelisted method through hooks.py. It is explicit, reversible, and upgrade-safe because Frappe internally reroutes calls at runtime. Monkey patching, on the other hand, modifies a function directly at import time by reassigning it in memory. It is brittle, harder to trace, and can break due to app load order or updates. In production, hooks should be preferred; monkey patching is only suitable for temporary or experimental use.
+
+2. What happens if two apps override the same method?
+If two apps register override_whitelisted_methods for the same method, only one override will apply. Frappe loads apps based on the order in sites/apps.txt, and the last loaded app’s override takes effect. There is no automatic chaining, so earlier overrides are silently replaced.
+
+3. Signature mismatch and TypeError
+When overriding a whitelisted method, the custom function must have the exact same parameters as the original. Since Frappe passes arguments using keywords, missing or mismatched parameters will cause a TypeError (e.g., “unexpected keyword argument” or “missing required positional argument”). Matching the signature ensures the override works without breaking the API.
+
+### F5 - Fixtures & Property Setters in Install
+1. Fieldname collision risk:
+If our Custom Field has:
+fieldname = "remarks"
+
+And in a future Frappe update:
+Core team also adds:
+fieldname = "remarks"
+
+Then:
+Migration fails
+Duplicate column error occurs
+Site breaks during update
+Because DB cannot have two columns with same name.
+
+2. If merged into one patch:
+
+During migration, order may break
+Database column may not exist yet
+Patch fails
+
+Patches must be:
+patch1.py
+patch2.py
+And listed separately in: patches.txt
+
+Because Frappe runs patches in order listed.Each patch is a migration checkpoint.Never merge dependent patches
+
+### H3 - List View & Tree View
+Tree DocType is used to represent hierarchical data structures such as Account or Employee hierarchy where records have parent-child relationships.
+
+doctype_tree_js is used to customize the behavior and UI of the Tree View in Frappe. A Tree DocType requires special fields such as parent_field to store the parent node and is_group to indicate whether the record is a group or a leaf node.
+
+### H4 - Client Script DocType vs Shipped JS
+Client Script vs App JS
+
+Client Script DocType allows writing JavaScript customizations directly in the database without deploying code. It is useful for quick UI changes by consultants or administrators. However, it is harder to version control and maintain in large systems.
+Shipped JS files are part of the application code and are managed using Git and deployment pipelines. App developers prefer this approach because it ensures version control, testing, and consistency across environments.
+
+Risks of Client Script in Production
+Client Scripts are stored in the database and can be modified directly in production, which can lead to unstable behavior if improperly edited. They also lack proper code review and version tracking.
+
+JS Hiding Is Not Security
+Hiding a field using JavaScript only affects the UI display. The data still exists in the backend and can be accessed through API calls. Therefore, JavaScript field hiding should never be considered a security mechanism. Proper security must be implemented using role permissions and field-level access control.
+
+### I1 - Query Report with SQL Safety
+The EXPLAIN statement was executed in the bench console to analyze the query execution plan. The output shows that the status column uses the status index in the key field, indicating that the database optimizer is using the index for filtering. This improves performance by avoiding a full table scan.

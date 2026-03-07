@@ -100,6 +100,10 @@ class JobCard(Document):
         job_card=self.name
     )
 
+        frappe.publish_realtime(
+            "job_ready",
+            {"name": self.name}
+        )
 
 
     def on_cancel(self):

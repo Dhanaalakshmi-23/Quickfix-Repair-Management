@@ -27,7 +27,7 @@
   "financials_and_delivery_section",
   "parts_total",
   "labour_charge",
-  "financial_amount",
+  "final_amount",
   "payment_status",
   "delivery_date",
   "remarks",
@@ -163,12 +163,6 @@
    "label": "Labour Charge"
   },
   {
-   "fieldname": "financial_amount",
-   "fieldtype": "Currency",
-   "label": "Financial Amount",
-   "read_only": 1
-  },
-  {
    "allow_on_submit": 1,
    "default": "Unpaid",
    "fieldname": "payment_status",
@@ -188,18 +182,26 @@
    "label": "Remarks"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "status",
    "fieldtype": "Select",
    "in_list_view": 1,
    "label": "Status",
-   "options": "Draft\nPending Diagnosis\nAwaiting Customer Approval\nIn Repair\nReady for Delivery\nDelivered\nCancelled"
+   "options": "Draft\nPending Diagnosis\nAwaiting Customer Approval\nIn Repair\nReady for Delivery\nDelivered\nCancelled\nRejected",
+   "search_index": 1
+  },
+  {
+   "fieldname": "final_amount",
+   "fieldtype": "Currency",
+   "label": "Final Amount",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-02-25 15:10:56.371238",
+ "modified": "2026-03-05 15:42:51.444339",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",

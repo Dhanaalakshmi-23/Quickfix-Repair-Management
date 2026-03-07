@@ -1,0 +1,20 @@
+[
+ {
+  "average_repair_hours": 6,
+  "description": "Our laptop repair service covers hardware and software issues for all leading brands.",
+  "device_type": "Laptop",
+  "docstatus": 0,
+  "doctype": "Device Type",
+  "modified": "2026-02-24 17:26:15.265124",
+  "name": "Laptop"
+ },
+ {
+  "average_repair_hours": 4,
+  "description": "We offer complete tablet repair services for display damage, touch issues, charging faults, battery replacement, camera problems, and software troubleshooting",
+  "device_type": "Tablet",
+  "docstatus": 0,
+  "doctype": "Device Type",
+  "modified": "2026-02-24 17:26:46.472439",
+  "name": "Tablet"
+ }
+]

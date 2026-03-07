@@ -19,3 +19,15 @@ def send_urgent_alert(job_card, manager):
         subject=subject,
         message=message
     )
+
+# Jinja Method
+def get_shop_name():
+    settings = frappe.get_single("QuickFix Settings")
+    return settings.shop_name if settings else ""
+
+
+# Jinja Filter
+def format_job_id(value):
+    if not value:
+        return ""
+    return f"JOB#{value}"
