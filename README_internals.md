@@ -218,3 +218,11 @@ Prepared Reports are useful when:
 - The report is used frequently but does not require real-time updates
 
 4. Caching Risk - If the underlying data changes between report preparations, users will see the previously cached result instead of the latest data. To mitigate this, reports can be regenerated periodically or users can manually refresh them.
+
+### I5 - Report Builder & Custom Report
+
+Report Builder is appropriate for simple reports that only require basic filtering, sorting, and grouping of data from a single DocType. It is useful for quickly creating reports through the UI without writing code, such as listing Job Cards by customer or viewing repair status.
+
+Script Report must be used when a report requires complex logic, calculations, joins between multiple DocTypes, or custom processing using Python/SQL. Developers typically use Script Reports for advanced analytics or performance reports.
+
+Using Report Builder in production can be a mistake when building reports that require heavy calculations or large datasets. For example, a technician performance dashboard calculating total repairs, revenue, and average repair time per technician would perform poorly and lack flexibility with Report Builder, so a Script Report would be the better choice.
