@@ -36,7 +36,13 @@ fixtures = [
     },
     {
         "doctype": "QuickFix Settings"
-    }
+    },
+    # {
+    #     "doctype": "Letter Head",
+    #     "filters": [
+    #         ["name", "=", "QuickFix Letter Head"]
+    #     ]
+    # }
 ]
 
 permission_query_conditions = {
@@ -95,6 +101,13 @@ override_whitelisted_methods = {
 doctype_js = {
     "Job Card": "public/js/job_card.js"
 }
+jinja = {
+    "methods":[
+        "quickfix.api.get_shop_name",
+        "quickfix.api.get_job_card_qr"
+    ]
+}
+
 
 # Apps
 # ------------------

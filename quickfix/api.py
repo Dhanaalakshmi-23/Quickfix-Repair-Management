@@ -1,5 +1,9 @@
 import frappe
 from frappe.client import get_count
+import qrcode
+import base64
+from io import BytesIO
+
 
 @frappe.whitelist()
 def share_job_card(job_card_name, customer_email):
@@ -108,3 +112,60 @@ def custom_get_count(doctype, filters=None, debug=False, cache=False):
 
     # Call original logic
     return get_count(doctype, filters, debug, cache)
+
+
+@frappe.whitelist()
+def prepare_technician_performance_report():
+
+    frappe.enqueue(
+        method="frappe.core.doctype.prepared_report.prepared_report.run_background",
+        queue="long",
+        timeout=600,
+        report_name="Technician Performance Report",
+        filters={}
+    )
+
+    return "Report preparation started in background."
+
+# This API endpoint is used to fetch data for the status chart on the dashboard. It retrieves the count of job cards grouped by their status and formats it for use in a chart.
+@frappe.whitelist()
+def get_status_chart_data():
+    
+    data = frappe.db.sql("""
+        SELECT status, COUNT(name)
+        FROM `tabJob Card`
+        GROUP BY status
+    """, as_list=1)
+
+    labels = []
+    values = []
+
+    for d in data:
+        labels.append(d[0])
+        values.append(d[1])
+
+    return {
+        "labels": labels,
+        "datasets": [
+            {
+                "name": "Job Cards",
+                "values": values
+            }
+        ]
+    }
+
+#jinja method to get shop name, used in website templates and reports
+def get_shop_name():
+    return "QuickFix Device Repair Shop"
+def get_job_card_qr(job_card_name):
+
+    url = frappe.utils.get_url(f"/app/job-card/{job_card_name}")
+
+    qr = qrcode.make(url)
+
+    buffered = BytesIO()
+    qr.save(buffered, format="PNG")
+
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+
+    return f"data:image/png;base64,{img_str}"

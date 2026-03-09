@@ -204,3 +204,56 @@ Hiding a field using JavaScript only affects the UI display. The data still exis
 
 ### I1 - Query Report with SQL Safety
 The EXPLAIN statement was executed in the bench console to analyze the query execution plan. The output shows that the status column uses the status index in the key field, indicating that the database optimizer is using the index for filtering. This improves performance by avoiding a full table scan.
+
+### I4 - Prepared Report
+1. Prepared Reports vs Real-Time Script Reports - Prepared Reports are used for large datasets where generating the report in real-time would be slow. The report is generated in the background using a worker and the result is cached in the Prepared Report DocType. Real-time Script Reports run immediately when the user opens the report and always show the latest data.
+
+2. Staleness Tradeoff - The Prepared Reports store cached results, so the data may become stale if the underlying records change after the report has been prepared. For example, if a new Job Card is created after the report is generated, the cached report will not include it until the report is regenerated.
+
+3. When to Use Prepared Reports
+
+Prepared Reports are useful when:
+- The dataset is large
+- Queries take a long time to run
+- The report is used frequently but does not require real-time updates
+
+4. Caching Risk - If the underlying data changes between report preparations, users will see the previously cached result instead of the latest data. To mitigate this, reports can be regenerated periodically or users can manually refresh them.
+
+### I5 - Report Builder & Custom Report
+
+Report Builder is appropriate for simple reports that only require basic filtering, sorting, and grouping of data from a single DocType. It is useful for quickly creating reports through the UI without writing code, such as listing Job Cards by customer or viewing repair status.
+
+Script Report must be used when a report requires complex logic, calculations, joins between multiple DocTypes, or custom processing using Python/SQL. Developers typically use Script Reports for advanced analytics or performance reports.
+
+Using Report Builder in production can be a mistake when building reports that require heavy calculations or large datasets. For example, a technician performance dashboard calculating total repairs, revenue, and average repair time per technician would perform poorly and lack flexibility with Report Builder, so a Script Report would be the better choice.
+
+### J1 - Jinja Print Format: Job Card Receipt
+1. Language Selection in Frappe Print Formats
+
+Frappe determines the language for printing based on the logged-in user’s language preference. If the user has selected a language in User Settings, Frappe uses that language when rendering the print format. If no user language is set, it falls back to the System Default Language. The `_()` function in Jinja templates is used for translations, and Frappe replaces the text with the appropriate translated string during rendering.
+
+Pattern 1: `frappe.get_all()` Inside Jinja Template
+
+Calling `frappe.get_all()` directly inside a Jinja template is not recommended. Templates should only handle presentation, not database queries. Doing queries in the template can slow down printing and mix business logic with UI code, making the template harder to maintain.
+
+Pattern 2: Pre-compute Data in `before_print()`
+
+A better approach is to compute required data in the backend using the `before_print()` method. The computed value can be attached to the document, such as `self.precomputed_field`, and then accessed in the template using `doc.precomputed_field`. This keeps the template clean and improves performance.
+
+### J2 - Raw Print vs HTML to PDF
+Raw printing sends ESC/POS commands directly to a thermal printer without
+generating HTML or PDF. It is commonly used for receipt printers where speed
+and simplicity are important.
+
+In contrast, Frappe's standard printing system converts HTML templates into
+PDF using WeasyPrint. The print format is written using HTML, CSS, and Jinja,
+and then rendered into a printable PDF document.
+
+Some CSS features that work in browsers may fail in WeasyPrint. Examples
+include Flexbox layouts, CSS Grid, and position: sticky. Because of this,
+print formats should use simple layouts such as tables or basic block elements.
+
+For thermal printing, a minimal print format is created with only essential
+fields like job number, customer name, and total amount. Numeric values such
+as currency should always use frappe.format_value() to ensure proper
+formatting with currency symbols, thousand separators, and correct precision.

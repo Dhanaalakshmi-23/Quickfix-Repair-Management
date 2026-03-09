@@ -75,7 +75,6 @@ def get_columns(filters):
     device_types = frappe.get_all("Device Type", fields=["name"])
 
     for dt in device_types:
-
         fieldname = dt.name.lower().replace(" ", "_")
 
         columns.append({
@@ -95,7 +94,7 @@ def get_columns(filters):
 def get_data(filters):
 
     conditions = {}
-    
+
     if filters.get("technician"):
         conditions["assigned_technician"] = filters.get("technician")
 
@@ -138,30 +137,33 @@ def get_data(filters):
                 "completed_jobs": 0,
                 "revenue": 0,
                 "turnaround_total": 0,
-                "turnaround_count": 0,
-                "completion_rate": 0
+                "turnaround_count": 0
             }
 
-            # initialize device type counters
+            # initialize device counters
             for dt in device_types:
                 fieldname = dt.name.lower().replace(" ", "_")
                 technician_data[tech][fieldname] = 0
 
         technician_data[tech]["total_jobs"] += 1
 
+        # Completed Jobs
         if job.status == "Delivered":
 
             technician_data[tech]["completed_jobs"] += 1
 
             if job.modified and job.creation:
 
-                days = (job.modified - job.creation).days
-                
+                diff = job.modified - job.creation
+                days = diff.total_seconds() / 86400
+
                 technician_data[tech]["turnaround_total"] += days
                 technician_data[tech]["turnaround_count"] += 1
 
+        # Revenue
         technician_data[tech]["revenue"] += job.estimated_cost or 0
 
+        # Device Type Count
         if job.device_type:
 
             fieldname = job.device_type.lower().replace(" ", "_")
@@ -173,18 +175,20 @@ def get_data(filters):
 
     for tech in technician_data.values():
 
+        # Avg Turnaround
         if tech["turnaround_count"] > 0:
             avg_turnaround = tech["turnaround_total"] / tech["turnaround_count"]
         else:
             avg_turnaround = 0
 
+        # Completion Rate
         if tech["total_jobs"] > 0:
             completion_rate = (tech["completed_jobs"] / tech["total_jobs"]) * 100
         else:
             completion_rate = 0
 
-        tech["avg_turnaround"] = avg_turnaround
-        tech["completion_rate"] = completion_rate
+        tech["avg_turnaround"] = round(avg_turnaround, 2)
+        tech["completion_rate"] = round(completion_rate, 2)
 
         data.append(tech)
 
@@ -262,7 +266,7 @@ def get_summary(data):
 
         {
             "label": "Best Technician",
-            "value": best_technician,
+            "value": best_technician or "N/A",
             "indicator": "Orange"
         }
     ]
