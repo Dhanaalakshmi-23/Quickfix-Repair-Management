@@ -107,7 +107,11 @@ jinja = {
         "quickfix.api.get_job_card_qr"
     ]
 }
-
+scheduler_events = {
+    "daily": [
+        "quickfix.utils.check_low_stock"
+    ]
+}
 
 # Apps
 # ------------------
