@@ -16,5 +16,14 @@
   "doctype": "Device Type",
   "modified": "2026-02-24 17:26:46.472439",
   "name": "Tablet"
+ },
+ {
+  "average_repair_hours": 0,
+  "description": null,
+  "device_type": "Mobile",
+  "docstatus": 0,
+  "doctype": "Device Type",
+  "modified": "2026-03-06 12:12:43.384376",
+  "name": "Mobile"
  }
 ]
