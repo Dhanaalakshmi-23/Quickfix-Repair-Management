@@ -169,3 +169,44 @@ def get_job_card_qr(job_card_name):
     img_str = base64.b64encode(buffered.getvalue()).decode()
 
     return f"data:image/png;base64,{img_str}"
+
+#Email notification when job is ready for pickup
+def send_job_ready_email(job_card):
+
+    # Get Job Card document
+    doc = frappe.get_doc("Job Card", job_card)
+
+    # Send email to customer
+    frappe.sendmail(
+        recipients=["dhanaalakshminarayanan@gmail.com"],
+        subject="Your Job is Ready",
+        message="Your service job is completed and ready for pickup."
+    )
+    
+#monthly revenue report generation, can be scheduled via hooks.py
+def generate_monthly_revenue_report(month):
+
+    # Get all delivered jobs
+    jobs = frappe.get_all(
+        "Job Card",
+        filters={"status": "Delivered"},
+        fields=["total_amount"]
+    )
+
+    total_revenue = 0
+
+    for job in jobs:
+        total_revenue += job.total_amount
+
+    frappe.log_error(
+        title="Monthly Revenue Report",
+        message=f"Total Revenue for {month}: {total_revenue}"
+    )
+def enqueue_monthly_report(month):
+
+    frappe.enqueue(
+        "quickfix.api.generate_monthly_revenue_report",
+        month=month,
+        queue="long",
+        timeout=600
+    )
