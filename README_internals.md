@@ -319,3 +319,10 @@ for jc in job_cards:
 ### Task - B
 Time using insert(): 0.8296403884887695
 Time using bulk_insert(): 0.037549495697021484
+
+### Task - C
+Why not add a search index to every field?
+
+Indexes improve query speed for searching and filtering, but they also add overhead to the database. Each index requires additional storage and must be updated whenever data in the table changes.
+
+Performance cost of over-indexing - Adding indexes to too many fields can slow down write operations such as INSERT, UPDATE, and DELETE, because the database must update all related indexes whenever a record changes. Over-indexing also increases disk usage and can make database maintenance more expensive. Therefore, indexes should only be added to fields that are frequently used in filters, searches, or joins.
