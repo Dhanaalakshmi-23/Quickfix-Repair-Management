@@ -257,3 +257,36 @@ For thermal printing, a minimal print format is created with only essential
 fields like job number, customer name, and total amount. Numeric values such
 as currency should always use frappe.format_value() to ensure proper
 formatting with currency symbols, thousand separators, and correct precision.
+
+### K1 - Background Jobs: Queues, Timeouts, Progress
+
+### Task - A : Queue names
+Frappe provides three background job queues: default, short, and long.
+
+The short queue is used for quick tasks such as sending emails,
+notifications, or lightweight updates. These jobs should complete
+quickly and should not wait behind heavy background processes.
+
+The default queue is used for normal background operations that take
+moderate processing time, such as periodic updates or scheduled tasks.
+
+The long queue is used for heavy or long-running operations such as
+report generation, large data processing, or exporting large datasets.
+These jobs are separated to prevent them from blocking faster tasks.
+
+### Task - D : Job failure handling
+To test job failure handling, a background job was intentionally made to raise an exception.
+
+The job was enqueued using frappe.enqueue(). When executed by the worker, the job failed and the exception was logged.
+
+The failure can be observed in:
+1. Setup → Error Log (stores traceback and error details)
+2. RQ Failed Jobs (Redis Queue job failure list)
+
+By default, Frappe does not retry failed background jobs automatically. The retry count is 0 unless explicitly configured using the retries parameter in frappe.enqueue().
+
+### K2 - Scheduler Events & Cron
+
+1. To disable scheduler from specific site use this command `bench --site sitename disable-scheduler`
+2. On development sites, automatic tasks like email sending, report generation, or cleanup jobs may run repeatedly and consume resources. Disabling the scheduler prevents unnecessary background jobs during development and testing.
+3. If a scheduled job is queued while the worker is down, the job remains in the Redis queue. When the worker starts again, it processes the pending jobs. Therefore, scheduled jobs are not lost and will execute once the worker becomes available.

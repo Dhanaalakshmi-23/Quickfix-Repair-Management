@@ -145,3 +145,11 @@ class JobCard(Document):
 
     def before_print(self, print_settings=None):
         self.print_summary = f"{self.customer_name} - {self.device_brand} {self.device_model}"
+    
+    def notify_customer(self):
+
+        frappe.enqueue(
+            "quickfix.api.send_job_ready_email",
+            job_card=self.name,
+            queue="short"
+        )
