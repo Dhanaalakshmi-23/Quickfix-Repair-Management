@@ -290,3 +290,28 @@ By default, Frappe does not retry failed background jobs automatically. The retr
 1. To disable scheduler from specific site use this command `bench --site sitename disable-scheduler`
 2. On development sites, automatic tasks like email sending, report generation, or cleanup jobs may run repeatedly and consume resources. Disabling the scheduler prevents unnecessary background jobs during development and testing.
 3. If a scheduled job is queued while the worker is down, the job remains in the Redis queue. When the worker starts again, it processes the pending jobs. Therefore, scheduled jobs are not lost and will execute once the worker becomes available.
+
+### K3 - 
+
+### Task - A
+1. N+1 Query 
+job_cards = frappe.get_all(
+    "Job Card",
+    fields=["name", "assigned_technician"]
+)
+
+tech_ids = [jc.assigned_technician for jc in job_cards]
+
+technicians = frappe.get_all(
+    "Technician",
+    filters={"name": ["in", tech_ids]},
+    fields=["name", "technician_name", "phone"]
+)
+
+tech_map = {t.name: t for t in technicians}
+
+for jc in job_cards:
+    tech = tech_map.get(jc.assigned_technician)
+
+    if tech:
+        print(tech.technician_name, tech.phone)
