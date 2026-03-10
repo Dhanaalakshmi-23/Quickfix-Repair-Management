@@ -1,5 +1,6 @@
 import frappe
 from frappe.utils import today,now
+import uuid
 
 
 def send_urgent_alert(job_card, manager):
@@ -82,3 +83,40 @@ def run_failure_test():
         "quickfix.utils.failing_background_job",
         queue="short"
     )
+
+
+def cancel_old_draft_job_cards():
+
+    frappe.db.sql("""
+        UPDATE `tabJob Card`
+        SET status = 'Cancelled'
+        WHERE status = 'Draft'
+        LIMIT 1000
+    """)
+
+    # frappe.db.commit()
+
+    print("1000 Draft Job Cards marked as Cancelled")
+
+
+
+def insert_audit_logs_bulk():
+
+    logs = []
+
+    for i in range(500):
+        logs.append((
+            str(uuid.uuid4()),  # name
+            "Cancel Job Card",  # action
+            frappe.session.user # user
+        ))
+
+    frappe.db.bulk_insert(
+        "Audit Log",
+        ["name", "action", "user"],
+        logs
+    )
+
+    # frappe.db.commit()
+
+    print("500 Audit Logs inserted using bulk_insert")

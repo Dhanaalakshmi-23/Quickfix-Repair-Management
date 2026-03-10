@@ -291,7 +291,7 @@ By default, Frappe does not retry failed background jobs automatically. The retr
 2. On development sites, automatic tasks like email sending, report generation, or cleanup jobs may run repeatedly and consume resources. Disabling the scheduler prevents unnecessary background jobs during development and testing.
 3. If a scheduled job is queued while the worker is down, the job remains in the Redis queue. When the worker starts again, it processes the pending jobs. Therefore, scheduled jobs are not lost and will execute once the worker becomes available.
 
-### K3 - 
+### K3 - Performance Engineering
 
 ### Task - A
 1. N+1 Query 
@@ -315,3 +315,7 @@ for jc in job_cards:
 
     if tech:
         print(tech.technician_name, tech.phone)
+
+### Task - B
+Time using insert(): 0.8296403884887695
+Time using bulk_insert(): 0.037549495697021484
