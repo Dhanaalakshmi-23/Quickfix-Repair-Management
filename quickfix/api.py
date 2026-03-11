@@ -235,3 +235,44 @@ def get_job_summary():
         "priority": job.priority,
         "creation_date": date.today()
     }
+
+
+# Api to check Rate limiting & abuse protection
+@frappe.whitelist(allow_guest=True)
+def get_job_by_phone():
+
+    phone = frappe.form_dict.get("phone")
+
+    # get client IP
+    ip = frappe.local.request_ip
+
+    cache = frappe.cache()
+
+    key = f"rate_limit:{ip}"
+
+    count = cache.get_value(key)
+
+    if not count:
+        count = 0
+
+    count = int(count)
+
+    if count >= 2:
+        frappe.response.http_status_code = 429
+        return {"error": "Rate limit exceeded. Try again later."}
+
+    # increment counter
+    cache.set_value(key, count + 1, expires_in_sec=60)
+
+    job = frappe.db.get_value(
+        "Job Card",
+        {"customer_phone": phone},
+        ["name", "status", "priority"],
+        as_dict=True
+    )
+
+    if not job:
+        frappe.response.http_status_code = 404
+        return {"error": "Job not found"}
+
+    return job
