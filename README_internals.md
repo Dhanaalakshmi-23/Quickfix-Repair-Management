@@ -513,3 +513,13 @@ Token Authentication uses an API Key and API Secret instead of login credentials
 Authorization: token api_key:api_secret
 
 * Best For: Server-to-server communication and API integrations.
+
+### Task - D
+
+Risks of allow_guest=True endpoints:
+
+1. API Abuse - Attackers can repeatedly call the API and overload the server.
+
+2. Data Scraping - Public APIs may expose business data that attackers can scrape.
+
+3. Denial of Service (DoS) - High volumes of requests can slow down or crash the system.
