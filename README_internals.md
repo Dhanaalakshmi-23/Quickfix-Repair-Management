@@ -523,3 +523,26 @@ Risks of allow_guest=True endpoints:
 2. Data Scraping - Public APIs may expose business data that attackers can scrape.
 
 3. Denial of Service (DoS) - High volumes of requests can slow down or crash the system.
+
+### M1 - Server Script Doctype
+
+1. Python functions/modules blocked in the Server Script sandbox
+Server Scripts run in a restricted sandbox for security. Some blocked modules include `os`, `sys`, `subprocess`, `socket`, `shutil`, and `requests`. Dangerous built-in functions like `open()`, `eval()`, `exec()`, `compile()`, and `__import__()` are also restricted to prevent unsafe operations.
+
+2. Three things you cannot do in a Server Script
+
+1. Access the file system (reading/writing files).
+2. Execute operating system commands.
+3. Import external Python libraries or modules.
+
+3. When Server Scripts are acceptable vs when to use app code
+Acceptable:
+* Simple automation (e.g., auto-updating a field before save).
+* Small internal API or quick reporting logic.
+
+Use App Code:
+* Complex business logic involving multiple doctypes.
+* External integrations (APIs, payment gateways, messaging services).
+
+4. Governance / Maintainability risks
+Server Scripts are stored in the database rather than version control. This makes them harder to track, review, and maintain, and they can be modified directly from the UI, which may introduce unexpected production issues.
