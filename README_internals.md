@@ -290,3 +290,201 @@ By default, Frappe does not retry failed background jobs automatically. The retr
 1. To disable scheduler from specific site use this command `bench --site sitename disable-scheduler`
 2. On development sites, automatic tasks like email sending, report generation, or cleanup jobs may run repeatedly and consume resources. Disabling the scheduler prevents unnecessary background jobs during development and testing.
 3. If a scheduled job is queued while the worker is down, the job remains in the Redis queue. When the worker starts again, it processes the pending jobs. Therefore, scheduled jobs are not lost and will execute once the worker becomes available.
+
+### K3 - Performance Engineering
+
+### Task - A
+1. N+1 Query 
+job_cards = frappe.get_all(
+    "Job Card",
+    fields=["name", "assigned_technician"]
+)
+
+tech_ids = [jc.assigned_technician for jc in job_cards]
+
+technicians = frappe.get_all(
+    "Technician",
+    filters={"name": ["in", tech_ids]},
+    fields=["name", "technician_name", "phone"]
+)
+
+tech_map = {t.name: t for t in technicians}
+
+for jc in job_cards:
+    tech = tech_map.get(jc.assigned_technician)
+
+    if tech:
+        print(tech.technician_name, tech.phone)
+
+### Task - B
+Time using insert(): 0.8296403884887695
+Time using bulk_insert(): 0.037549495697021484
+
+### Task - C
+Why not add a search index to every field?
+
+Indexes improve query speed for searching and filtering, but they also add overhead to the database. Each index requires additional storage and must be updated whenever data in the table changes.
+
+Performance cost of over-indexing - Adding indexes to too many fields can slow down write operations such as INSERT, UPDATE, and DELETE, because the database must update all related indexes whenever a record changes. Over-indexing also increases disk usage and can make database maintenance more expensive. Therefore, indexes should only be added to fields that are frequently used in filters, searches, or joins.
+
+### L1 - REST Resource API & Custom API
+
+### Task - A
+1. When we use get method with the `http://localhost:8000/api/resource/Job%20Card` URL we'll get all the job cards which we have. 
+{
+    "data": [
+        {
+            "name": "JC-2026-00083"
+        },
+        {
+            "name": "JC-2026-00084"
+        },
+        {
+            "name": "JC-2026-00085"
+        },
+        {
+            "name": "JC-2026-00086"
+        },
+        {
+            "name": "JC-2026-00087"
+        },
+        {
+            "name": "JC-2026-00088"
+        },
+        {
+            "name": "JC-2026-00089"
+        },
+        {
+            "name": "JC-2026-00090"
+        },
+        {
+            "name": "JC-2026-00091"
+        },
+        {
+            "name": "JC-2026-00092"
+        },
+        {
+            "name": "JC-2026-00093"
+        },
+        {
+            "name": "JC-2026-00094"
+        },
+        {
+            "name": "JC-2026-00095"
+        },
+        {
+            "name": "JC-2026-00096"
+        },
+        {
+            "name": "JC-2026-00097"
+        },
+        {
+            "name": "JC-2026-00098"
+        },
+        {
+            "name": "JC-2026-00099"
+        },
+        {
+            "name": "JC-2026-00100"
+        },
+        {
+            "name": "JC-2026-00101"
+        },
+        {
+            "name": "JC-2026-00102"
+        }
+    ],
+}
+2. when we use get method with the URL `http://localhost:8000/api/resource/Job%20Card/JC-2026-00083` we'll get the deatils which is inside that particular doctype in dictonry fromat.
+
+{
+    "data": {
+        "name": "JC-2026-00083",
+        "owner": "Administrator",
+        "creation": "2026-03-06 13:25:21.734146",
+        "modified": "2026-03-06 13:25:21.734146",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 0,
+        "customer_name": "Customer 1",
+        "customer_phone": "9876543210",
+        "device_type": "Tablet",
+        "problem_description": "Device not working",
+        "assigned_technician": "TECH-0007",
+        "estimated_cost": 507.0,
+        "priority": "Normal",
+        "parts_total": 2800.0,
+        "labour_charge": 500.0,
+        "final_amount": 3300,
+        "payment_status": "Unpaid",
+        "status": "Rejected",
+        "doctype": "Job Card",
+        "parts_used": [
+            {
+                "name": "l11k3ubf6r",
+                "owner": "Administrator",
+                "creation": "2026-03-06 13:25:21.734146",
+                "modified": "2026-03-06 13:25:21.734146",
+                "modified_by": "Administrator",
+                "docstatus": 0,
+                "idx": 1,
+                "part": "SP-0004",
+                "part_name": "Tablet Battery",
+                "unit_price": 1400.0,
+                "quantity": 2.0,
+                "total_price": 2800.0,
+                "parent": "JC-2026-00083",
+                "parentfield": "parts_used",
+                "parenttype": "Job Card",
+                "doctype": "Part Usage Entry"
+            }
+        ]
+    },
+}
+
+3. when we use post method with the URL `http://localhost:8000/api/resource/Spare%20Part` we can create spare parts.
+{
+    "data": {
+        "name": "SP-0011",
+        "owner": "Administrator",
+        "creation": "2026-03-11 10:40:27.456023",
+        "modified": "2026-03-11 10:40:27.456023",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 0,
+        "part_name": "Battery",
+        "unit_cost": 1000.0,
+        "selling_price": 1500.0,
+        "stock_qty": 50.0,
+        "reorder_level": 5.0,
+        "is_active": 1,
+        "doctype": "Spare Part"
+    },
+}
+
+4. When we use put method with the URL`http://localhost:8000/api/resource/Spare%20Part/SP-0001` we can update a particular field inside the sapre part doctype.
+{
+    "data": {
+        "name": "SP-0001",
+        "owner": "Administrator",
+        "creation": "2026-03-06 13:10:27.251334",
+        "modified": "2026-03-11 10:43:08.687370",
+        "modified_by": "Administrator",
+        "docstatus": 0,
+        "idx": 0,
+        "part_name": "iPhone Screen",
+        "part_code": "SCR001",
+        "compatible_device_type": "Smartphone",
+        "unit_cost": 800.0,
+        "selling_price": 1500.0,
+        "stock_qty": 10.0,
+        "reorder_level": 5.0,
+        "is_active": 1,
+        "doctype": "Spare Part"
+    },
+}
+
+5. When we use delete method with the URL`http://localhost:8000/api/resource/Spare%20Part/SP-0012` we'll delete the data in spare part doctype.
+{
+    "data": "ok",
+}

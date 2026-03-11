@@ -107,7 +107,8 @@
    "fieldname": "assigned_technician",
    "fieldtype": "Link",
    "label": "Assigned Technician",
-   "options": "Technician"
+   "options": "Technician",
+   "search_index": 1
   },
   {
    "depends_on": "doc.assigned_technician;",
