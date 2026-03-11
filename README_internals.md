@@ -546,3 +546,18 @@ Use App Code:
 
 4. Governance / Maintainability risks
 Server Scripts are stored in the database rather than version control. This makes them harder to track, review, and maintain, and they can be modified directly from the UI, which may introduce unexpected production issues.
+
+### M2 - Caching, Redis & Cache Invalidation
+
+### Task - A
+Frappe uses Redis to cache frequently accessed data for better performance.
+
+Examples of data cached in Redis:
+
+1. Bootinfo – Contains user session data such as roles, permissions, modules, and system defaults required during UI load.
+2. DocType Metadata – Structure of DocTypes including fields, properties, and permissions.
+3. Website Context – Cached page context used for rendering website pages.
+4. Translations – Language translations used in the frontend.
+5. User Permissions – Cached permission rules to avoid repeated database queries.
+
+Running frappe.clear_cache() removes these cached values and forces Frappe to rebuild them from the database.
