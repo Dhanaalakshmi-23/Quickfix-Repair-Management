@@ -488,3 +488,28 @@ Performance cost of over-indexing - Adding indexes to too many fields can slow d
 {
     "data": "ok",
 }
+
+Here is a **short and clean README version**:
+
+### Task-B
+
+1. Session Authentication
+Session Authentication requires the user to log in using a username and password. After login, the server creates a session and sends a cookie (sid) to the browser. The browser automatically includes this cookie in future requests for authentication.
+
+* Authentication Method: Cookie
+* Best For: Browser-based applications
+
+Example:
+
+GET /api/resource/Job Card
+Cookie: sid=xxxxxxxx
+
+2. Token Authentication
+Token Authentication uses an API Key and API Secret instead of login credentials. These are generated in User → API Access. The client must include them in the Authorization header.
+
+* Authentication Method: Authorization Header
+* Header Format:
+
+Authorization: token api_key:api_secret
+
+* Best For: Server-to-server communication and API integrations.
