@@ -104,7 +104,7 @@ def insert_audit_logs_bulk():
 
     logs = []
 
-    for i in range(500):
+    for i in range(10):
         logs.append((
             str(uuid.uuid4()),  # name
             "Cancel Job Card",  # action
@@ -117,6 +117,6 @@ def insert_audit_logs_bulk():
         logs
     )
 
-    # frappe.db.commit()
+    frappe.db.commit()
 
     print("500 Audit Logs inserted using bulk_insert")

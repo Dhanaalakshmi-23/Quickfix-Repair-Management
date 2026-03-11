@@ -1,8 +1,10 @@
 import frappe
 from frappe.client import get_count
+from frappe.types.filter import date
 import qrcode
 import base64
 from io import BytesIO
+
 
 
 @frappe.whitelist()
@@ -182,7 +184,7 @@ def send_job_ready_email(job_card):
         subject="Your Job is Ready",
         message="Your service job is completed and ready for pickup."
     )
-    
+
 #monthly revenue report generation, can be scheduled via hooks.py
 def generate_monthly_revenue_report(month):
 
@@ -210,3 +212,26 @@ def enqueue_monthly_report(month):
         queue="long",
         timeout=600
     )
+
+#Used for testing the custom api method
+@frappe.whitelist()
+def get_job_summary():
+    
+    job_card_name = frappe.form_dict.get("job_card_name")
+
+    if not job_card_name:
+        frappe.response.http_status_code = 400
+        return {"error": "job_card_name is required"}
+
+    if not frappe.db.exists("Job Card", job_card_name):
+        frappe.response.http_status_code = 404
+        return {"error": "Not found"}
+
+    job = frappe.get_doc("Job Card", job_card_name)
+
+    return {
+        "job_card": job.name,
+        "status": job.status,
+        "priority": job.priority,
+        "creation_date": date.today()
+    }
