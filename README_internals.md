@@ -579,3 +579,22 @@ The command `bench build --app quickfix` is mainly used to compile Python files 
 Because of this architecture, JavaScript files in Frappe are primarily stored in the database and Redis, not in the filesystem. Running the build command synchronizes those database records with the browser cache.
 
 If a DocType change causes stale UI issues, the recommended solution is to restart Redis so that all frontend form layouts automatically regenerate inside the browser without needing to reload the page. This ensures that the UI reflects the most recent DocType structure immediately.
+
+### M3 - Logging, Error Handling & Observability
+### Task C – Production Debugging Pattern
+
+When a bug occurs only in production and cannot be reproduced in development, debugging can be done using **Error Logs, Audit Logs, and application logs from `frappe.logger`.
+
+1. Check Error Log (Setup → Error Log)
+   Identify the error traceback, method name, timestamp, and reference document. The traceback shows the exact location where the exception occurred.
+
+2. Check Audit Log
+   Review document history to see who modified the record, what fields were changed, and when the changes happened. This helps detect incorrect data or unexpected updates.
+
+3. Review Logger Output
+   Application logs written using `frappe.logger("quickfix")` are stored in
+   `sites/quickfix-dev.localhost/logs/quickfix.log`.
+   These logs help trace the execution flow and identify the step where the failure occurred.
+
+4. Reproduce in Development
+   Using the information from logs and production data, replicate the same inputs and workflow in the development environment to reproduce and fix the bug.
