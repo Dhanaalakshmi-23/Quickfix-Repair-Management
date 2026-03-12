@@ -403,3 +403,42 @@ def payment_webhook():
     return {"status": "ok"}
 
 
+logger = frappe.logger("quickfix")
+
+@frappe.whitelist()
+def send_webhook(job_card_name):
+    logger.info(f"Webhook triggered for {job_card_name}")
+    
+    settings = frappe.get_single("QuickFix Settings")
+    if not settings.webhook_url:
+        logger.warning(f"No webhook URL configured, skipping for {job_card_name}")
+        return
+
+    import requests
+    try:
+        doc = frappe.get_doc("Job Card", job_card_name)
+        payload = {
+            "event": "job_submitted",
+            "job_card": doc.name,
+            "amount": doc.final_amount
+        }
+        r = requests.post(settings.webhook_url, json=payload, timeout=5)
+        r.raise_for_status()
+        logger.info(f"Webhook sent successfully for {job_card_name}")
+
+    except Exception as e:
+        logger.error(f"Webhook failed for {job_card_name}: {e}")
+        frappe.log_error(
+            title="Webhook Error",
+            message=frappe.get_traceback()
+        )
+
+@frappe.whitelist()
+def trigger_test_error():
+    frappe.enqueue(
+        "quickfix.api.failing_background_job",
+        queue="short"
+    )
+
+def failing_background_job():
+    raise Exception("Test background job failure for M3")
