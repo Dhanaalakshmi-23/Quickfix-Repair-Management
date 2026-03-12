@@ -489,7 +489,6 @@ Performance cost of over-indexing - Adding indexes to too many fields can slow d
     "data": "ok",
 }
 
-Here is a **short and clean README version**:
 
 ### Task-B
 
@@ -523,6 +522,14 @@ Risks of allow_guest=True endpoints:
 2. Data Scraping - Public APIs may expose business data that attackers can scrape.
 
 3. Denial of Service (DoS) - High volumes of requests can slow down or crash the system.
+
+### L2 - Webhooks: Outgoing & Incoming
+
+1. Why use hmac.compare_digest instead of ==?
+hmac.compare_digest prevents timing attacks by comparing two signatures in constant time. Using == may leak timing information that attackers can exploit to guess the signature character by character.
+
+2. Deduplication Strategy
+The webhook handler checks the Audit Log before processing a payment event. If an entry with the same document_name and action already exists, the request is treated as a duplicate and ignored. This ensures that if the payment gateway sends the same event multiple times, the payment is processed only once.
 
 ### M1 - Server Script Doctype
 
