@@ -598,3 +598,42 @@ When a bug occurs only in production and cannot be reproduced in development, de
 
 4. Reproduce in Development
    Using the information from logs and production data, replicate the same inputs and workflow in the development environment to reproduce and fix the bug.
+
+### N1 - Security Audit
+### Task D - Private vs public files:
+Public Files - Public files are accessible directly through the /files/ URL and are stored in the public/files directory. They can be accessed by anyone without authentication.
+
+Private Files - Private files are stored in the private/files directory and require authentication and permission checks before access. They are used for sensitive documents such as invoices or customer data.
+
+When to Use Each :
+1. Use Public Files For
+logos
+product images
+website assets
+
+2. Use Private Files For
+invoices
+service reports
+user documents
+financial records
+
+### Task - E
+
+Sample function to get secret values
+def read_payment_key():
+    api_key = frappe.conf.get("payment_api_key")
+    if not api_key:
+        frappe.throw("Payment API key not configured")
+    return api_key
+
+Hardcoded API Keys : 
+Hardcoding API keys in source code is insecure because the keys become visible to anyone with repository access and may leak through version control history.
+
+Using site_config.json :
+Secrets should be stored in site_config.json and accessed using frappe.conf.get() so that sensitive information is kept outside the application code.
+
+Why Not common_site_config.json : 
+common_site_config.json is shared across multiple sites, so storing secrets there could expose them across environments if compromised.
+
+Risk of Git Commit :
+Committing site_config.json to Git can expose API keys and credentials publicly, allowing attackers to misuse external services or access sensitive resources.

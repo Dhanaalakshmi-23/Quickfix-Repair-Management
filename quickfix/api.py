@@ -8,7 +8,7 @@ from frappe.query_builder import DocType
 from frappe.utils import now_datetime, add_days
 import hmac
 import hashlib
-import json
+import json,re
 
 def get_status_chart_datas():
 
@@ -181,7 +181,8 @@ def mark_ready(job_card):
 
     return "Ready"
 
-
+#ignore_permissions=True is used to insert an Audit Log entry whenever the custom count function is called, ensuring the query activity is recorded.
+#This bypass is acceptable because it is system-generated logging for monitoring purposes, not a direct user operation on the Audit Log.
 @frappe.whitelist()
 def custom_get_count(doctype, filters=None, debug=False, cache=False):
     
@@ -359,7 +360,8 @@ def get_job_by_phone():
     return job
 
 
-
+#ignore_permissions=True is used to update the Job Card payment status and create an Audit Log entry after verifying the payment webhook.
+#This is acceptable because the update is triggered by a trusted external payment system after signature verification, making it a system-driven action rather than a normal user request.
 @frappe.whitelist(allow_guest=True)
 def payment_webhook():
 
@@ -442,3 +444,66 @@ def trigger_test_error():
 
 def failing_background_job():
     raise Exception("Test background job failure for M3")
+
+#N1 - Unsafe API endpoint vulnerable to SQL Injection
+@frappe.whitelist(allow_guest=True)
+def get_job_by_phone_unsafe(customer_phone):
+
+    query = f"""
+        SELECT name, status
+        FROM `tabJob Card`
+        WHERE customer_phone = '{customer_phone}'
+    """
+
+    result = frappe.db.sql(query, as_dict=True)
+
+    return result
+#N1 - Safe version of the API endpoint using parameterized queries to prevent SQL Injection
+@frappe.whitelist(allow_guest=True)
+def get_job_by_phone_safe(customer_phone):
+
+    query = """
+        SELECT name, status
+        FROM `tabJob Card`
+        WHERE customer_phone = %s
+    """
+
+    result = frappe.db.sql(query, (customer_phone,), as_dict=True)
+
+    return result
+
+
+@frappe.whitelist(allow_guest=True)
+def track_job(customer_phone):
+
+ 
+    customer_phone = re.sub(r"\D", "", customer_phone)
+
+    if len(customer_phone) > 10:
+        frappe.throw("Invalid phone number")
+
+    # rate limiting
+    ip = frappe.local.request_ip
+    cache = frappe.cache()
+
+    key = f"rate_limit:{ip}"
+
+    count = cache.get_value(key) or 0
+    count = int(count)
+
+    if count > 50:
+        frappe.throw("Too many requests. Try again later.")
+
+    cache.set_value(key, count + 1, expires_in_sec=60)
+
+    # check job existence
+    jobs = frappe.get_all(
+        "Job Card",
+        filters={"customer_phone": customer_phone},
+        fields=["name", "status"]
+    )
+
+    if not jobs:
+        frappe.throw("No job found for this phone number")
+
+    return jobs

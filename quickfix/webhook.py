@@ -4,6 +4,9 @@ import json
 import hashlib
 
 
+# `ignore_permissions=True` is used to insert an **Audit Log record** after a webhook is successfully sent, ensuring the system records the event even if the current user lacks permission.
+# This is acceptable because the logging happens as part of a **background system process (webhook handling)** rather than a direct user action.
+
 def send_webhook(job_card_name, retry_count=0):
 
     settings = frappe.get_single("QuickFix Settings")
