@@ -37,7 +37,8 @@ def format_job_id(value):
     return f"JOB#{value}"
 
 
-
+#ignore_permissions=True is used to create an Audit Log entry after the daily low-stock check runs.
+#This is acceptable because the function is a system scheduled task, and the system must log the execution even without normal user permissions.
 def check_low_stock():
 
     start = today() + " 00:00:00"

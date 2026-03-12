@@ -65,6 +65,9 @@ class JobCard(Document):
                     f"Not enough stock for Part {row.part}. "
                     f"Available: {stock_qty}, Required: {row.quantity}"
                 )
+
+    #ignore_permissions=True is used while inserting the Service Invoice so the system can automatically create the invoice during Job Card submission without checking user permissions.
+    # This is acceptable because it is a system-triggered action inside a DocType event (on_submit), not a direct user or guest API request.
     def on_submit(self):
         # Reduce stock for used parts
         for row in self.parts_used:
