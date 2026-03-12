@@ -6,6 +6,28 @@ import base64
 from io import BytesIO
 
 
+def get_status_chart_datas():
+
+    cache = frappe.cache()
+    cache_key = "job_card_status_chart"
+
+    # check cache first
+    data = cache.get_value(cache_key)
+
+    if data:
+        return data
+
+    # if not cached, run DB query
+    data = frappe.db.sql("""
+        SELECT status, COUNT(*) as count
+        FROM `tabJob Card`
+        GROUP BY status
+    """, as_dict=True)
+
+    # store in cache for 300 seconds
+    cache.set_value(cache_key, data, expires_in_sec=300)
+
+    return data
 
 @frappe.whitelist()
 def share_job_card(job_card_name, customer_email):
@@ -132,19 +154,19 @@ def prepare_technician_performance_report():
 # This API endpoint is used to fetch data for the status chart on the dashboard. It retrieves the count of job cards grouped by their status and formats it for use in a chart.
 @frappe.whitelist()
 def get_status_chart_data():
-    
+
     data = frappe.db.sql("""
-        SELECT status, COUNT(name)
+        SELECT status, COUNT(name) as count
         FROM `tabJob Card`
         GROUP BY status
-    """, as_list=1)
+    """, as_dict=True)
 
     labels = []
     values = []
 
-    for d in data:
-        labels.append(d[0])
-        values.append(d[1])
+    for row in data:
+        labels.append(row.status)
+        values.append(row.count)
 
     return {
         "labels": labels,
@@ -276,3 +298,5 @@ def get_job_by_phone():
         return {"error": "Job not found"}
 
     return job
+
+

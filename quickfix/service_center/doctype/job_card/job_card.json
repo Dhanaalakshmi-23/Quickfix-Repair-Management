@@ -28,6 +28,7 @@
   "parts_total",
   "labour_charge",
   "final_amount",
+  "net_amount",
   "payment_status",
   "delivery_date",
   "remarks",
@@ -193,8 +194,14 @@
   },
   {
    "fieldname": "final_amount",
-   "fieldtype": "Int",
+   "fieldtype": "Currency",
    "label": "Final Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "net_amount",
+   "fieldtype": "Float",
+   "label": "Net Amount",
    "read_only": 1
   }
  ],
@@ -202,50 +209,13 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2026-03-09 13:45:25.713535",
+ "modified": "2026-03-11 16:01:41.731100",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "Job Card",
  "naming_rule": "Expression",
  "owner": "Administrator",
- "permissions": [
-  {
-   "create": 1,
-   "delete": 1,
-   "email": 1,
-   "export": 1,
-   "print": 1,
-   "read": 1,
-   "report": 1,
-   "role": "System Manager",
-   "share": 1,
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "create": 1,
-   "print": 1,
-   "read": 1,
-   "role": "QF Service Staff",
-   "write": 1
-  },
-  {
-   "read": 1,
-   "role": "QF Technician",
-   "submit": 1,
-   "write": 1
-  },
-  {
-   "amend": 1,
-   "cancel": 1,
-   "create": 1,
-   "delete": 1,
-   "read": 1,
-   "role": "QF Manager",
-   "submit": 1,
-   "write": 1
-  }
- ],
+ "permissions": [],
  "row_format": "Dynamic",
  "rows_threshold_for_grid_search": 20,
  "sort_field": "creation",
