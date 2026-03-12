@@ -561,3 +561,14 @@ Examples of data cached in Redis:
 5. User Permissions – Cached permission rules to avoid repeated database queries.
 
 Running frappe.clear_cache() removes these cached values and forces Frappe to rebuild them from the database.
+
+### Task - C
+
+When the browser shows old JavaScript after making changes, it usually means the database cache is still storing the old JS code. In this situation, the correct way to clear the asset cache is to run : bench restart-computer
+This command forces the browser to forget all JavaScript files stored in the database and reload them directly from Redis.
+
+The command `bench build --app quickfix` is mainly used to compile Python files into JavaScript so the browser can execute backend logic on the frontend. It also uploads the compiled files into MySQL where the browser reads them during page load.
+
+Because of this architecture, JavaScript files in Frappe are primarily stored in the database and Redis, not in the filesystem. Running the build command synchronizes those database records with the browser cache.
+
+If a DocType change causes stale UI issues, the recommended solution is to restart Redis so that all frontend form layouts automatically regenerate inside the browser without needing to reload the page. This ensures that the UI reflects the most recent DocType structure immediately.
