@@ -4,8 +4,87 @@ from frappe.types.filter import date
 import qrcode
 import base64
 from io import BytesIO
+from frappe.query_builder import DocType
+from frappe.utils import now_datetime, add_days
 
 
+def get_status_chart_datas():
+
+    cache = frappe.cache()
+    cache_key = "job_card_status_chart"
+
+    # check cache first
+    data = cache.get_value(cache_key)
+
+    if data:
+        return data
+
+    # if not cached, run DB query
+    data = frappe.db.sql("""
+        SELECT status, COUNT(*) as count
+        FROM `tabJob Card`
+        GROUP BY status
+    """, as_dict=True)
+
+    # store in cache for 300 seconds
+    cache.set_value(cache_key, data, expires_in_sec=300)
+
+    return data
+
+
+@frappe.whitelist()
+def get_overdue_jobs():
+
+    JC = DocType("Job Card")
+
+    seven_days_ago = add_days(now_datetime(), -7)
+
+    result = (
+        frappe.qb
+        .from_(JC)
+        .select(
+            JC.name,
+            JC.customer_name,
+            JC.assigned_technician,
+            JC.creation
+        )
+        .where(
+            (JC.status.isin(["Pending Diagnosis", "In Repair"])) &
+            (JC.creation < seven_days_ago)
+        )
+        .orderby(JC.creation)
+        .run(as_dict=True)
+    )
+
+    return result
+
+
+@frappe.whitelist()
+def transfer_job(from_tech, to_tech):
+
+    try:
+
+        frappe.db.sql("""
+            UPDATE `tabJob Card`
+            SET assigned_technician = %s
+            WHERE assigned_technician = %s
+            AND status IN ('Pending Diagnosis','In Repair')
+        """, (to_tech, from_tech))
+
+        frappe.db.commit()
+
+        return "Jobs transferred successfully"
+
+    except Exception:
+
+        frappe.db.rollback()
+
+        frappe.log_error(
+            frappe.get_traceback(),
+            "Job Transfer Failed"
+        )
+
+        raise
 
 @frappe.whitelist()
 def share_job_card(job_card_name, customer_email):
@@ -132,19 +211,19 @@ def prepare_technician_performance_report():
 # This API endpoint is used to fetch data for the status chart on the dashboard. It retrieves the count of job cards grouped by their status and formats it for use in a chart.
 @frappe.whitelist()
 def get_status_chart_data():
-    
+
     data = frappe.db.sql("""
-        SELECT status, COUNT(name)
+        SELECT status, COUNT(name) as count
         FROM `tabJob Card`
         GROUP BY status
-    """, as_list=1)
+    """, as_dict=True)
 
     labels = []
     values = []
 
-    for d in data:
-        labels.append(d[0])
-        values.append(d[1])
+    for row in data:
+        labels.append(row.status)
+        values.append(row.count)
 
     return {
         "labels": labels,
@@ -276,3 +355,5 @@ def get_job_by_phone():
         return {"error": "Job not found"}
 
     return job
+
+

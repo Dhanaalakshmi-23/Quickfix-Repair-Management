@@ -61,8 +61,12 @@ doc_events = {
         "on_update": "quickfix.audit.log_change",
         "on_submit": "quickfix.audit.log_change",
         "on_cancel": "quickfix.audit.log_change"
+    },
+    "Job Card": {
+        "on_update": "quickfix.cache.clear_job_card_cache"
     }
 }    
+
 after_install = "quickfix.setup.after_install"
 
 before_uninstall = "quickfix.setup.before_uninstall"

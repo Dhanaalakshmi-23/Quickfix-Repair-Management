@@ -3,6 +3,8 @@ from frappe.utils import today,now
 import uuid
 
 
+
+
 def send_urgent_alert(job_card, manager):
 
     subject = f"Urgent Job Card {job_card} Needs Technician"
