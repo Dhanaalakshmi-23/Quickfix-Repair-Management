@@ -4,6 +4,8 @@ from frappe.types.filter import date
 import qrcode
 import base64
 from io import BytesIO
+from frappe.query_builder import DocType
+from frappe.utils import now_datetime, add_days
 
 
 def get_status_chart_datas():
@@ -28,6 +30,61 @@ def get_status_chart_datas():
     cache.set_value(cache_key, data, expires_in_sec=300)
 
     return data
+
+
+@frappe.whitelist()
+def get_overdue_jobs():
+
+    JC = DocType("Job Card")
+
+    seven_days_ago = add_days(now_datetime(), -7)
+
+    result = (
+        frappe.qb
+        .from_(JC)
+        .select(
+            JC.name,
+            JC.customer_name,
+            JC.assigned_technician,
+            JC.creation
+        )
+        .where(
+            (JC.status.isin(["Pending Diagnosis", "In Repair"])) &
+            (JC.creation < seven_days_ago)
+        )
+        .orderby(JC.creation)
+        .run(as_dict=True)
+    )
+
+    return result
+
+
+@frappe.whitelist()
+def transfer_job(from_tech, to_tech):
+
+    try:
+
+        frappe.db.sql("""
+            UPDATE `tabJob Card`
+            SET assigned_technician = %s
+            WHERE assigned_technician = %s
+            AND status IN ('Pending Diagnosis','In Repair')
+        """, (to_tech, from_tech))
+
+        frappe.db.commit()
+
+        return "Jobs transferred successfully"
+
+    except Exception:
+
+        frappe.db.rollback()
+
+        frappe.log_error(
+            frappe.get_traceback(),
+            "Job Transfer Failed"
+        )
+
+        raise
 
 @frappe.whitelist()
 def share_job_card(job_card_name, customer_email):
