@@ -107,6 +107,10 @@ class JobCard(Document):
             "job_ready",
             {"name": self.name}
         )
+        frappe.enqueue(
+        "quickfix.webhooks.send_webhook",
+        job_card_name=self.name
+    )
 
 
     def on_cancel(self):

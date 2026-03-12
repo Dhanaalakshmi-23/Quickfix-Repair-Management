@@ -6,7 +6,9 @@ import base64
 from io import BytesIO
 from frappe.query_builder import DocType
 from frappe.utils import now_datetime, add_days
-
+import hmac
+import hashlib
+import json
 
 def get_status_chart_datas():
 
@@ -355,5 +357,49 @@ def get_job_by_phone():
         return {"error": "Job not found"}
 
     return job
+
+
+
+@frappe.whitelist(allow_guest=True)
+def payment_webhook():
+
+    payload = frappe.request.data
+
+    secret = frappe.conf.get("payment_webhook_secret", "")
+
+    signature = frappe.get_request_header("X-Signature")
+
+    expected = hmac.new(
+        secret.encode(),
+        payload,
+        hashlib.sha256
+    ).hexdigest()
+
+    if not hmac.compare_digest(expected, signature or ""):
+        frappe.throw("Invalid signature", frappe.AuthenticationError)
+
+    data = json.loads(payload)
+
+    if frappe.db.exists(
+        "Audit Log",
+        {"action": "payment_received", "document_name": data["ref"]}
+    ):
+        return {"status": "duplicate", "message": "Already processed"}
+
+    job = frappe.get_doc("Job Card", data["ref"])
+
+    job.payment_status = "Paid"
+    job.save(ignore_permissions=True)
+
+    frappe.get_doc({
+        "doctype": "Audit Log",
+        "action": "payment_received",
+        "document_type": "Job Card",
+        "document_name": data["ref"]
+    }).insert(ignore_permissions=True)
+
+    frappe.db.commit()
+
+    return {"status": "ok"}
 
 
