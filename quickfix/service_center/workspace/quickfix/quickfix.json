@@ -2,7 +2,8 @@
  "app": "quickfix",
  "charts": [
   {
-   "chart_name": "Job Status Chart"
+   "chart_name": "Job Status Chart",
+   "label": "Status"
   }
  ],
  "content": "[]",
@@ -18,24 +19,26 @@
  "label": "QuickFix",
  "link_type": "DocType",
  "links": [],
- "modified": "2026-03-11 16:27:11.403617",
+ "modified": "2026-03-13 10:58:22.740528",
  "modified_by": "Administrator",
  "module": "Service Center",
  "name": "QuickFix",
- "number_cards": [],
+ "number_cards": [
+  {
+   "label": "Job Opens",
+   "number_card_name": "Open Job Cards"
+  }
+ ],
  "owner": "Administrator",
  "public": 1,
  "quick_lists": [],
- "roles": [],
- "sequence_id": 0.0,
- "shortcuts": [
+ "roles": [
   {
-   "doc_view": "New",
-   "label": "Add New Job Card",
-   "link_to": "Job Card",
-   "type": "DocType"
+   "role": "System Manager"
   }
  ],
+ "sequence_id": 0.0,
+ "shortcuts": [],
  "title": "QuickFix",
  "type": "Workspace"
 }

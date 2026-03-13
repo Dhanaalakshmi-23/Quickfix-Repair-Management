@@ -185,6 +185,25 @@ And listed separately in: patches.txt
 
 Because Frappe runs patches in order listed.Each patch is a migration checkpoint.Never merge dependent patches
 
+
+### G1 - Safe Monkey Patch with Version Guard
+What is _qf_patched guard for?
+It prevents the monkey patch from being applied multiple times. Without the guard, the patched function could wrap itself repeatedly, causing duplicated prefixes or unexpected behaviour.
+
+Why isolate patches in monkey_patches.py?
+Keeping patches in a dedicated file ensures they are easy to audit, maintain, and disable. It avoids accidental execution during module imports and makes the risks explicit.
+
+Why escalation order?
+doc_events
+↓
+override_doctype_class
+↓
+override_whitelisted_methods
+↓
+monkey patch
+
+This order moves from safe framework extension points to dangerous internal modification, ensuring the least risky solution is attempted first.
+
 ### H3 - List View & Tree View
 Tree DocType is used to represent hierarchical data structures such as Account or Employee hierarchy where records have parent-child relationships.
 
