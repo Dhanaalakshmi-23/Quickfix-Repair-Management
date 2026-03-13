@@ -122,6 +122,13 @@ scheduler_events = {
         ]
     }
 }
+portal_menu_items = [
+    {
+        "title": "Track Job",
+        "route": "/track-job",
+        "role": "Guest"
+    }
+]
 
 # Apps
 # ------------------

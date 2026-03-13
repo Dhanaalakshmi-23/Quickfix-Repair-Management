@@ -114,6 +114,22 @@ class JobCard(Document):
         "quickfix.webhooks.send_webhook",
         job_card_name=self.name
     )
+        pdf = frappe.get_print(
+        "Job Card",
+        self.name,
+        print_format="Job Card Receipt",
+        as_pdf=True
+    )
+
+        frappe.sendmail(
+        recipients=self.customer_email,
+        subject="Job Card Receipt",
+        message="Attached is your job card receipt.",
+        attachments=[{
+            "fname": f"{self.name}.pdf",
+            "fcontent": pdf
+        }]
+    )
 
 
     def on_cancel(self):

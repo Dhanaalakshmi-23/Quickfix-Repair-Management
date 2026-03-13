@@ -1,0 +1,16 @@
+<h1>Track Your Repair Job</h1>
+
+<form method="GET">
+    <input type="text" name="job_id" placeholder="Enter Job Card ID">
+    <button type="submit">Search</button>
+</form>
+
+{% if job %}
+<hr>
+<h3>Job Details</h3>
+
+<p><b>Job ID:</b> {{ job.name }}</p>
+<p><b>Status:</b> {{ job.status }}</p>
+<p><b>Device:</b> {{ job.device_name }}</p>
+<p><b>Last Updated:</b> {{ job.modified }}</p>
+{% endif %}
