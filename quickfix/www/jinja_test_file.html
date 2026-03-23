@@ -1,0 +1,11 @@
+{% extends "templates/web.html" %}
+
+{% block page_content %}
+
+<h3>Shop Name:</h3>
+<p>{{ get_shop_name() }}</p>
+
+<h3>Formatted Job ID:</h3>
+<p>{{ "JC-2026-00116" | format_job_id }}</p>
+
+{% endblock %}

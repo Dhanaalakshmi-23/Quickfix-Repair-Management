@@ -5,9 +5,11 @@ class CustomJobCard(JobCard):
     def validate(self):
         super().validate()
         self.check_urgent_unassigned()
+        
     def check_urgent_unassigned(self):
         if self.priority == "Urgent" and not self.assigned_technician:
             settings = frappe.get_single("QuickFix Settings")
+            
             frappe.enqueue(
                 "quickfix.utils.send_urgent_alert",
                 job_card=self.name,

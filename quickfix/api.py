@@ -100,6 +100,7 @@ def share_job_card(job_card_name, customer_email):
     )
     
     return f"Job Card {job_card_name} shared with {customer_email}"
+
 @frappe.whitelist()
 def manager_only_action():
     frappe.only_for("QF Manager")
@@ -491,7 +492,7 @@ def track_job(customer_phone):
     count = cache.get_value(key) or 0
     count = int(count)
 
-    if count > 50:
+    if count > 2:
         frappe.throw("Too many requests. Try again later.")
 
     cache.set_value(key, count + 1, expires_in_sec=60)
