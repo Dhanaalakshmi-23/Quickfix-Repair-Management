@@ -74,7 +74,7 @@ jobs:
       - name: Install app on site
         run: |
           cd frappe-bench
-          bench --site test.localhost install-app quickfix
+          pip install -e apps/quickfix
 
       - name: Enable developer mode
         run: |
