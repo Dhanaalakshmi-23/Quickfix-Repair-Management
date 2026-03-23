@@ -14,7 +14,7 @@ jobs:
 
     services:
       mariadb:
-        image: mariadb:10.6
+        image: mariadb:11.8
         env:
           MYSQL_ROOT_PASSWORD: root
         ports:
@@ -34,10 +34,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v6
         with:
-          python-version: "3.14" 
+          python-version: '3.14'
 
       - name: Cache pip dependencies
         uses: actions/cache@v4
@@ -47,8 +47,11 @@ jobs:
           restore-keys: |
             pip-${{ runner.os }}-
 
-      - name: Install bench
-        run: pip install frappe-bench
+      - name: Bench Setup
+        run: |
+          pip install frappe-bench
+          bench init --skip-redis-config-generation --skip-assets --python "$(which python)" ~/frappe-bench
+
 
       - name: Install Redis
         run: |
