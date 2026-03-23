@@ -5,6 +5,10 @@
     <button type="submit">Search</button>
 </form>
 
+{% if error %}
+    <p style="color:red;">{{ error }}</p>
+{% endif %}
+
 {% if job %}
 <hr>
 <h3>Job Details</h3>

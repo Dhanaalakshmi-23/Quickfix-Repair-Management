@@ -5,12 +5,12 @@ from frappe.model.naming import make_autoname
 
 class SparePart(Document):
 
-    def autoname(self):
-        if not self.part_code:
-            return
+    # def autoname(self):
+    #     if not self.part_code:
+    #         return
 
-        generated_name = make_autoname("PART-.YYYY.-.####")
-        self.name = f"{self.part_code.upper()}-{generated_name}"
+    #     generated_name = make_autoname("PART-.YYYY.-.####")
+    #     self.name = f"{self.part_code.upper()}-{generated_name}"
 
 
     def validate(self):

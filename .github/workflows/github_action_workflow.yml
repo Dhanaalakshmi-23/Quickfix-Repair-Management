@@ -1,0 +1,100 @@
+name : Quickfix CI
+
+# Trigger on every push
+on :
+  push:
+    branches:
+      -main
+  pull_request:
+    branches:
+      -main
+
+# Run on Ubuntu
+jobs:
+  test:
+    runs-on: ubuntu-latest # Tells which os to be used
+
+# It starts background containers (like mini servers)
+    services:
+
+      mariadb: # Start Mariadb
+        image: mariadb:10.6
+        env:
+          MYSQL_ROOT_PASSWORD: root 
+        ports:
+          - 3306:3306 #github action port mapping
+        options: >- # Checks whether mariadb is ready to use
+          --health-cmd="mysqladmin ping -h localhost -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+      # Start Redis
+      redis:
+        image: redis:7
+        ports:
+          - 6379:6379 #redis port 
+
+      steps:
+      - name: Checkout repository #Downloads your GitHub repo into the Linux
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: pip-${{ runner.os }}-${{ hashFiles('**/requirements.txt') }} # Cache identifier based on OS and requirements.txt hash
+          restore-keys: |
+            pip-${{ runner.os }}-
+        # Caching pip avoids re-downloading dependencies every run,
+        # significantly reducing CI execution time.
+
+      - name: Install bench
+        run: |
+          pip install frappe-bench
+
+      - name: Initialize bench
+        run: |
+          bench init --frappe-branch version-14 frappe-bench --skip-assets
+
+      - name: Change to bench directory
+        run: cd frappe-bench
+
+      - name: Setup site
+        run: |
+          cd frappe-bench
+          bench new-site test.localhost \
+            --mariadb-root-password root \
+            --admin-password admin \
+            --db-name test_quickfix
+
+      - name: Get QuickFix app
+        uses: actions/checkout@v4
+        with:
+          path: frappe-bench/apps/quickfix
+
+      - name: Install app on site
+        run: |
+          cd frappe-bench
+          bench --site test.localhost install-app quickfix
+
+      - name: Enable developer mode
+        run: |
+          cd frappe-bench
+          bench --site test.localhost set-config developer_mode 1
+
+      - name: Load test fixtures
+        run: |
+          cd frappe-bench
+          bench --site test.localhost execute quickfix.tests.setup_test_data.load_test_fixtures
+
+      - name: Run tests
+        run: |
+          cd frappe-bench
+          bench --site test.localhost run-tests --app quickfix --verbose
+        continue-on-error: false
+

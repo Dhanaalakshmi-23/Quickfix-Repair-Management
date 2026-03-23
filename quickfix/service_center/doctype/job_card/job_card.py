@@ -7,9 +7,6 @@ from frappe.model.document import Document
 
 
 class JobCard(Document):
-
-    def validate(self):
-        self.net_amount = self.final_amount or 0
         
     def before_save(self):
         if self.labour_charge is None:
